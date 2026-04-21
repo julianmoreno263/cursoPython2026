@@ -4,7 +4,7 @@ from client.gui_app import Frame, barraMenu
 def main():
     root=tk.Tk()
     root.title("Catálogo Películas")
-    root.iconbitmap("catalogo_peliculas/img/cp-logo.ico")
+    root.iconbitmap(r"D:/Curso Python/6-proyecto/catalogoPeliculas/catalogo_peliculas/img/cp-logo.ico")
     root.resizable(False,False)
     barraMenu(root)
 
