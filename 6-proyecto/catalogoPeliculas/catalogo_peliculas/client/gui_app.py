@@ -1,8 +1,9 @@
 
 import tkinter as tk
 from tkinter import ttk
+from tkinter import messagebox
 from model.peliculaCrud import crearTabla,borrarTabla
-from model.peliculaCrud import Pelicula, guardarPelicula
+from model.peliculaCrud import Pelicula, guardarPelicula,listarPelicula,editarPelicula
 
 
 #clase para el Frame
@@ -12,6 +13,8 @@ class Frame(tk.Frame):
         self.root=root
         self.pack()
         # self.config(bg="green")
+
+        self.idPelicula=None
 
         self.camposPelicula()
         self.deshabilitarCampos()
@@ -94,13 +97,32 @@ class Frame(tk.Frame):
             self.miGenero.get()
         )
 
-        guardarPelicula(pelicula)
+        #condicional para guardar o editar pelicula
+        if self.idPelicula==None:
+            guardarPelicula(pelicula)
+        else:
+            editarPelicula(pelicula,self.idPelicula)
+
+
+        self.tablaPeliculas()#con esta linea vamos actualizando la lista de peliculas en la GUI
         self.deshabilitarCampos()
 
     #funcion para crear la tabla de la bd
     def tablaPeliculas(self):
+
+        #aqui recuperamos la lista de peliculas
+        self.listaPeliculas=listarPelicula()
+        self.listaPeliculas.reverse()#invertimos la lista porque al mostrarla la esta mostrando invertida
+
+
+
         self.tabla=ttk.Treeview(self,columns=("Nombre","Duración","Género"))                       
-        self.tabla.grid(row=4,column=0,columnspan=4)
+        self.tabla.grid(row=4,column=0,columnspan=4,sticky="nse")
+
+        #scroll bar para la tabla si excede 10 registros
+        self.scroll=ttk.Scrollbar(self, orient="vertical",command=self.tabla.yview)
+        self.scroll.grid(row=4,column=4,sticky="nse")
+        self.tabla.configure(yscrollcommand=self.scroll.set)
 
         #creamos los encabezados
         self.tabla.heading("#0",text="ID")
@@ -108,11 +130,12 @@ class Frame(tk.Frame):
         self.tabla.heading("#2",text="DURACIÓN")
         self.tabla.heading("#3",text="GÉNERO")
 
-        #insertamos datos de prueba
-        self.tabla.insert("",0,text="1",values=("Los vengadores","2.35","Acción"))
+        #iteramos la lista de peliculas
+        for p in self.listaPeliculas:
+            self.tabla.insert("",0,text=p[0],values=(p[1],p[2],p[3]))
 
         #boton de editar
-        self.botonEditar=tk.Button(self,text="Editar")
+        self.botonEditar=tk.Button(self,text="Editar",command=self.editarDatos)
         self.botonEditar.config(width=20,font=("Arial",12,"bold"),fg="#DAD5D6",bg="#158645"
                                ,cursor="hand2",activebackground="#35BD6F")
         self.botonEditar.grid(row=5,column=0,padx=10,pady=10)
@@ -123,9 +146,30 @@ class Frame(tk.Frame):
                                ,cursor="hand2",activebackground="#E15370")
         self.botonEliminar.grid(row=5,column=1,padx=10,pady=10)
 
+    def editarDatos(self):
+        try:
+            # 1. Obtenemos la tupla de selección
+            seleccion = self.tabla.selection()
+        
+            # 2. Si hay algo seleccionado, extraemos el ID
+            if seleccion:
+                # Agregamos [0] para sacar el primer elemento de la tupla, asi recuperamos los datos de la tabla GUI
+                self.idPelicula = self.tabla.item(seleccion[0])["text"]
+                self.nombrePelicula=self.tabla.item(seleccion[0])["values"][0]
+                self.duracionPelicula=self.tabla.item(seleccion[0])["values"][0]
+                self.generoPelicula=self.tabla.item(seleccion[0])["values"][0]
 
+                #luego de capturar los datos,habilitamos los entryes
+                self.habilitarCampos()
+                #los datos que capturamos los escribimos en los entryes para poder editarlos
+                self.entryNombre.insert(0,self.nombrePelicula)
+                self.entryDuracion.insert(0,self.duracionPelicula)
+                self.entryGenero.insert(0,self.generoPelicula)
 
-
+        except:
+            titulo="Edición de datos"
+            mensaje="No ha seleccionado ningun registro"
+            messagebox.showerror(titulo,mensaje)
 
 
 

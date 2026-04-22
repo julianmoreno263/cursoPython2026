@@ -73,3 +73,38 @@ def guardarPelicula(pelicula):
         titulo="Conexión al Registro"
         mensaje="La tabla peliculas no está creada en la base de datos"
         messagebox.showerror(titulo,mensaje)
+
+
+def listarPelicula():
+    conexion=ConexionDB()
+    listaPeliculas=[]
+    sql="SELECT * FROM peliculas"
+
+    try:
+        conexion.cursor.execute(sql)
+        listaPeliculas=conexion.cursor.fetchall()
+        conexion.cerrarConexion()
+    except:
+        titulo="Conexión al Registro"
+        mensaje="Crea la tabla en la base de datos"
+        messagebox.showwarning(titulo,mensaje)
+
+    return listaPeliculas
+
+
+def editarPelicula(pelicula,idPelicula):
+    conexion=ConexionDB()
+
+    sql=f"""
+        UPDATE peliculas 
+        SET nombre='{pelicula.nombre}', duracion='{pelicula.duracion}',genero='{pelicula.genero}'
+        WHERE idPelicula={idPelicula}
+    """
+
+    try:
+        conexion.cursor.execute(sql)
+        conexion.cerrarConexion()
+    except:
+        titulo="Edición de datos"
+        mensaje="No se ha podido editar el registro"
+        messagebox.showerror(titulo,mensaje)
