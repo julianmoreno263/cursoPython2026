@@ -3,7 +3,7 @@ import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox
 from model.peliculaCrud import crearTabla,borrarTabla
-from model.peliculaCrud import Pelicula, guardarPelicula,listarPelicula,editarPelicula
+from model.peliculaCrud import Pelicula, guardarPelicula,listarPelicula,editarPelicula,eliminar
 
 
 #clase para el Frame
@@ -76,6 +76,7 @@ class Frame(tk.Frame):
         self.botonCancelar.config(state="normal")
 
     def deshabilitarCampos(self):
+        self.idPelicula=None
         #enviamos datos vacios al momento de deshabilitar los entryes para que se borren los datos que puedan tener
         self.miNombre.set("")
         self.miDuracion.set("")
@@ -141,7 +142,7 @@ class Frame(tk.Frame):
         self.botonEditar.grid(row=5,column=0,padx=10,pady=10)
 
         #boton eliminar
-        self.botonEliminar=tk.Button(self,text="Eliminar")
+        self.botonEliminar=tk.Button(self,text="Eliminar",command=self.eliminarDatos)
         self.botonEliminar.config(width=20,font=("Arial",12,"bold"),fg="#DAD5D6",bg="#BD152E"
                                ,cursor="hand2",activebackground="#E15370")
         self.botonEliminar.grid(row=5,column=1,padx=10,pady=10)
@@ -156,8 +157,8 @@ class Frame(tk.Frame):
                 # Agregamos [0] para sacar el primer elemento de la tupla, asi recuperamos los datos de la tabla GUI
                 self.idPelicula = self.tabla.item(seleccion[0])["text"]
                 self.nombrePelicula=self.tabla.item(seleccion[0])["values"][0]
-                self.duracionPelicula=self.tabla.item(seleccion[0])["values"][0]
-                self.generoPelicula=self.tabla.item(seleccion[0])["values"][0]
+                self.duracionPelicula=self.tabla.item(seleccion[0])["values"][1]
+                self.generoPelicula=self.tabla.item(seleccion[0])["values"][2]
 
                 #luego de capturar los datos,habilitamos los entryes
                 self.habilitarCampos()
@@ -171,6 +172,23 @@ class Frame(tk.Frame):
             mensaje="No ha seleccionado ningun registro"
             messagebox.showerror(titulo,mensaje)
 
+
+    def eliminarDatos(self):
+        try:
+            #Obtenemos la tupla de selección
+            seleccion = self.tabla.selection()
+            self.idPelicula = self.tabla.item(seleccion[0])["text"]
+            eliminar(self.idPelicula)
+
+            #despues de eliminar,actualizamos la tabla de peliculas de la GUI
+            self.tablaPeliculas()
+            #reiniciamos el id
+            self.idPelicula=None
+
+        except:
+            titulo="Eliminar un registro"
+            mensaje="No ha seleccionado ningun registro"
+            messagebox.showerror(titulo,mensaje)
 
 
 #funcion para el menu
