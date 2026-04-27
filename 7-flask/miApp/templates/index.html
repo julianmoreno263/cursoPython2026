@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi sitio web</title>
+</head>
+<body>
+    {#en las plantillas podemos recibir los argumentos que pasemos en la funcion utilizando {{}}, tambien podemos utilizar estructuras de control si necesitamos utilizando {% %} y {% endif %} para indicar donde termina en el caso del if.  NOTA: en jinja asi son los comentarios#}
+    <h1>Bienvenido a mi sitio web</h1>
+    {% if name %}
+    <p>Hola {{ name }}</p>
+    {% else %}
+    <p>Hola desconocido</p>
+    {% endif %}
+</body>
+</html>
