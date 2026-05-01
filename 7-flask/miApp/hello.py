@@ -1,5 +1,7 @@
 from flask import Flask, render_template, url_for, request
-
+from flask_wtf import FlaskForm
+from wtforms import StringField,PasswordField,SubmitField #estas clases crean inputs de tipo str,password y submit
+from wtforms.validators import DataRequired,Length
 from datetime import datetime
 
 
@@ -8,6 +10,11 @@ from datetime import datetime
 
 #creamos aplicacion flask
 app=Flask(__name__)
+
+#cuando trabajamos con formularios creados con WTForms debemos generar una clave secreta para evitar ataques csrf
+app.config.from_mapping(
+    SECRET_KEY="dev"
+)
 
 #podemos crear filtros personalizados,son en si funciones,por ejemplo si queremos mostrar una fecha con un formato especifico,creamos esa funcion que se pasa como un filtro en la plantilla donde queremos mostrarla. Para que esta funcion flask la vea como un filtro la debemos agregar como una funcion decoradora poniendo: @app.add-template-filter,o tambien se puede registrar asi: app.add-template-filter(today,"today"),poniendo el nombre de la funcion.
 
@@ -59,16 +66,27 @@ from markupsafe import escape
 def code(code):
     return f"<code>{escape(code)}</code>"
 
+#crear formularios con la biblioteca flask-wtf
+#creamos una clase que herede de Flaskform
+class RegisterForm(FlaskForm):
+    username=StringField("Nombre de usuario: ", validators=[DataRequired(),Length(min=4,max=25)])
+    password=PasswordField("Password: ", validators=[DataRequired(),Length(min=6,max=40)])
+    submit=SubmitField("Registrar: ")
+
+
 #Registrar usuario,se le puede especificar a la ruta los metodos con los que va a trabajar esta ruta,se debe importar el metodo request para hacer peticiones con python
 @app.route("/auth/register",methods=["GET","POST"])
 def register():
-    #asi capturo los datos que se envian desde el formulario
-    if request.method=="POST":
-        username=request.form["username"]
-        password=request.form["password"]
+
+    #instancia de formulario creado con WTForms
+    form=RegisterForm()
+    if form.validate_on_submit():
+        username=form.username.data
+        password=form.password.data
         return f"Nombre de usuario: {username}, Contraseña: {password}"
 
-    return render_template("auth/register.html")
+
+    return render_template("auth/register.html",form=form)
 
 
     
