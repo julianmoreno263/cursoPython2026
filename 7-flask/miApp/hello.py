@@ -1,4 +1,4 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, url_for, request
 
 from datetime import datetime
 
@@ -24,8 +24,12 @@ def repeat(s,n):
 
 #creamos la ruta principal la cual debe ir asociada a una funcion, estas funciones representan las vistas de la aplicacion. Una vista puede tener varias rutas,por ejemplo la pagina principal puede tener la ruta "/" y la ruta     "/index". Con render_template renderizo las plantillas, tambien se pueden pasar parametros para mostrarlos desde la plantilla,en la plantilla html se reciben utilizando {{}}
 @app.route("/")
-@app.route("/index")
 def index():
+    #con url_for contruyo rutas
+    print(url_for("index"))
+    print(url_for("hello"))
+    print(url_for("code",code='print("hola")'))
+
     name="Julian"
     friends=["Ingrid","sandra","pepe","juan"]
     date=datetime.now()
@@ -54,5 +58,17 @@ from markupsafe import escape
 @app.route("/code/<path:code>")
 def code(code):
     return f"<code>{escape(code)}</code>"
+
+#Registrar usuario,se le puede especificar a la ruta los metodos con los que va a trabajar esta ruta,se debe importar el metodo request para hacer peticiones con python
+@app.route("/auth/register",methods=["GET","POST"])
+def register():
+    #asi capturo los datos que se envian desde el formulario
+    if request.method=="POST":
+        username=request.form["username"]
+        password=request.form["password"]
+        return f"Nombre de usuario: {username}, Contraseña: {password}"
+
+    return render_template("auth/register.html")
+
 
     
