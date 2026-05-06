@@ -4,6 +4,7 @@ from flask import (Blueprint, render_template,request,url_for,redirect,flash,ses
 from werkzeug.security import generate_password_hash,check_password_hash
 from .models import User  #con esta linea se migran los modelos para la bd
 from todor import db
+import functools
 
 #instancia de blueprint,este es el prefijo para las demas rutas
 bp=Blueprint("auth",__name__,url_prefix="/auth")
@@ -74,3 +75,89 @@ def loadLoggedUser():
 def logout():
     session.clear()
     return redirect(url_for("index"))
+
+
+
+#esta funcion permitira especificar que se debe iniciar sesion para poder acceder a las demas partes de la aplicacion, para esto usamos el paquete functools
+def loginRequired(view):
+    @functools.wraps(view)
+    def wrapper_view(**kwargs):
+        if g.user is None:
+            return redirect(url_for("auth.login"))
+        return view(**kwargs)
+    return wrapper_view
+
+
+# Este código define lo que en Python conocemos como un decorador. Su función principal es actuar como un "guardia de seguridad" para tus rutas o funciones: antes de dejar entrar a alguien a una página, verifica si tiene las llaves (si ha iniciado sesión).
+
+# Aquí tienes el desglose paso a paso:
+
+# 1. La estructura del "Envoltorio"
+# El decorador funciona como una caja de regalo.
+
+# loginRequired(view): Es la caja exterior. Recibe la función original (la vista de tu página) que quieres proteger.
+
+# @functools.wraps(view): Es un detalle técnico importante. Sirve para que la función no "olvide" su nombre original y sus metadatos después de ser decorada.
+
+# wrapper_view: Es el papel de regalo o la lógica que envuelve a la función original.
+
+# 2. La lógica de control (El "Guardia")
+# Dentro de la función interna (wrapper_view), ocurre la magia:
+
+# if g.user is None:: Aquí el código pregunta: "¿Hay un usuario identificado en la sesión actual?".
+
+# return redirect(...): Si no hay un usuario (es None), el guardia no te deja pasar y te envía automáticamente a la página de inicio de sesión (auth.login).
+
+# return view(kwargs): Si el usuario sí existe, el guardia te da el paso y ejecuta la función original que querías ver.
+
+# 3. ¿Cómo se usa en la vida real?
+# En lugar de escribir ese if en cada una de tus funciones, simplemente pones una etiqueta encima de ellas. Por ejemplo:
+
+# Python
+# @loginRequired
+# def perfil_usuario():
+#     return "Bienvenido a tu perfil"
+# En resumen:
+# ¿Tienes sesión iniciada? Entras a la función y ves el contenido.
+
+# ¿No tienes sesión? Te expulsa y te manda al login.
+
+# Es una forma elegante de reutilizar código y mantener tu aplicación segura sin repetir la misma validación una y otra vez.
+
+#osea se crea esta funcion decoradora y se le pasa a las demas funciones donde necesitamos que se ejecute
+
+# Imagina que tienes una aplicación con 20 funciones diferentes (ver perfil, editar fotos, borrar cuenta, etc.). Sin el decorador, tendrías que escribir el código de verificación de usuario dentro de cada una de esas 20 funciones. Con el decorador, solo escribes la lógica una vez.
+
+# ¿Cómo funciona el flujo de ejecución?
+# Cuando pones @loginRequired sobre una función, el flujo de tu programa cambia de una línea recta a un desvío de seguridad:
+
+# Llamada: Intentas entrar a la función editar_perfil().
+
+# Interceptación: El decorador se pone en medio. "¡Espera! Antes de ir a editar_perfil, pasa por aquí".
+
+# Evaluación: Se ejecuta el if g.user is None.
+
+# Decisión:
+
+# Si es True: Te desvía a la página de Login. La función original editar_perfil nunca se llega a ejecutar.
+
+# Si es False: Te deja pasar y finalmente se ejecuta editar_perfil.
+
+# ¿Por qué se usa kwargs?
+# Habrás notado que el código usa kwargs. Esto es para que el decorador sea universal.
+
+# Algunas funciones de tu web no reciben parámetros.
+
+# Otras reciben un id_usuario.
+
+
+# ¿Por qué se usa kwargs?
+# Habrás notado que el código usa kwargs. Esto es para que el decorador sea universal.
+
+# Algunas funciones de tu web no reciben parámetros.
+
+# Otras reciben un id_usuario.
+
+# Otras reciben un slug_articulo.
+
+# Al usar kwargs (y a veces también *args), le dices al decorador: "No importa qué argumentos necesite la función original, tú simplemente recíbelos todos y pásaselos cuando le des permiso de ejecutarse".
