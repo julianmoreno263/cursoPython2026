@@ -1,5 +1,10 @@
 from flask import Flask
 from blogr import home,auth,post
+from flask_sqlalchemy import SQLAlchemy
+
+
+#instancia de la db
+db=SQLAlchemy()
 
 
 #Este código define lo que en el mundo de Flask se conoce como una Application Factory (Fábrica de Aplicaciones).
@@ -11,6 +16,10 @@ def createApp():
 
     #crear app de flask, El argumento __name__ le dice a Flask dónde buscar recursos como plantillas y archivos estáticos.
     app=Flask(__name__)
+
+    #aqui cargamos el archivo de configuracion
+    app.config.from_object("config.Config")
+    db.init_app(app)
 
     #registrar vistas, estás diciéndole a la aplicación principal: "Oye, todas las rutas y funciones que definí en el Blueprint llamado 'home', o 'auth',etc, ahora forman parte de esta app".
     app.register_blueprint(home.bp)
