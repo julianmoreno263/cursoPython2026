@@ -1,9 +1,8 @@
-
-SQLITE="sqlite:///project.db"
-POSTGRESQL="postgresql+psycopg2://postgres:tor@localhost:5432/blogposts_db"
+# config.py
+POSTGRESQL = "postgresql+psycopg2://postgres:tor@localhost:5432/blogposts-db"
 
 class Config:
-    DEBUG=True
-    SECRET_KEY="dev"
+    DEBUG = True
+    SECRET_KEY = "dev"
+    SQLALCHEMY_DATABASE_URI = POSTGRESQL
 
-    SQLALCHEMY_DATABASE_URI=POSTGRESQL

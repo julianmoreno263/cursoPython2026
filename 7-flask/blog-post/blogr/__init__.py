@@ -1,5 +1,4 @@
 from flask import Flask
-from blogr import home,auth,post
 from flask_sqlalchemy import SQLAlchemy
 
 
@@ -19,12 +18,21 @@ def createApp():
 
     #aqui cargamos el archivo de configuracion
     app.config.from_object("config.Config")
+
+    #cargamos los modelos de la bd
+    from blogr import home,auth,post
     db.init_app(app)
 
     #registrar vistas, estás diciéndole a la aplicación principal: "Oye, todas las rutas y funciones que definí en el Blueprint llamado 'home', o 'auth',etc, ahora forman parte de esta app".
+    
     app.register_blueprint(home.bp)
     app.register_blueprint(auth.bp)
     app.register_blueprint(post.bp) # type: ignore
+
+    #aqui migramos los modelos de las tablas a la bd
+    from .models import User,Post
+    with app.app_context():
+        db.create_all()
 
 
         
