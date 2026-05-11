@@ -1,4 +1,5 @@
 from os import error
+import re
 from flask import Blueprint,render_template,request,url_for,redirect,flash,session,g
 from werkzeug.security import generate_password_hash, check_password_hash
 from .models import User
@@ -88,9 +89,30 @@ def login_required(view):
     return wrapped_view
 
 
+@bp.route("/profile/<int:id>",methods=("GET", "POST"))
+@login_required
+def profile(id):
+    #capturamos el usuario que esta logeado por su id
+    user=User.query.get_or_404(id)
+    #si el metodo es post,podemos enviar datos modificados
+    if request.method=="POST":
+        user.username=request.form.get('username')
+        password=request.form.get('password')
 
+        error=None
 
+        #aqui se valida si se ha ingresado un password nuevo,entonces se guarda con un nuevo hash
+        if len(password)!=0: # type: ignore
+            user.password=generate_password_hash(password) # type: ignore
+        elif len(password) >0 and len(password)<6: # type: ignore
+            error="La contraseña debe de tener más de 5 caracteres"
 
-@bp.route("/profile")
-def profile():
-    return "Página de perfil"
+        if error is not None:
+            flash(error)
+        else:
+            db.session.commit()
+            return redirect(url_for("auth.profile", id=user.id))
+        
+        flash(error)
+
+    return render_template("auth/profile.html", user=user)
