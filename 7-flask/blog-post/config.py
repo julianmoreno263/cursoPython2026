@@ -5,4 +5,6 @@ class Config:
     DEBUG = True
     SECRET_KEY = "dev"
     SQLALCHEMY_DATABASE_URI = POSTGRESQL
+    CKEDITOR_PKG_TYPE="full"
+    
 
