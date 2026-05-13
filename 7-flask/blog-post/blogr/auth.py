@@ -1,7 +1,9 @@
 from os import error
 import re
+from tkinter import PhotoImage
 from flask import Blueprint,render_template,request,url_for,redirect,flash,session,g
 from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.utils import secure_filename
 from .models import User
 from blogr import db
 import functools
@@ -88,12 +90,23 @@ def login_required(view):
         return view(**kwargs)
     return wrapped_view
 
+#editar perfil, obtener una foto
+def get_photo(id):
+    #obtenemos el usuario por su id
+    user=User.query.get_or_404(id)
+    photo=None
+    if photo !=None:
+        photo=user.photo
+    return photo
+
 
 @bp.route("/profile/<int:id>",methods=("GET", "POST"))
 @login_required
 def profile(id):
     #capturamos el usuario que esta logeado por su id
     user=User.query.get_or_404(id)
+    #obtenemos la foto del usuario
+    photo=get_photo(id)
     #si el metodo es post,podemos enviar datos modificados
     if request.method=="POST":
         user.username=request.form.get('username')
@@ -107,6 +120,13 @@ def profile(id):
         elif len(password) >0 and len(password)<6: # type: ignore
             error="La contraseña debe de tener más de 5 caracteres"
 
+        #capturamos foto y la salvamos en la carpeta media
+        if request.files["photo"]:
+            photo=request.files["photo"]
+            photo.save(f"blogr/static/media/{secure_filename(photo.filename)}") # type: ignore
+            #aqui guardamos la ruta de la foto en la bd
+            user.photo=f"media/{secure_filename(photo.filename)}" # type: ignore
+
         if error is not None:
             flash(error)
         else:
@@ -115,4 +135,7 @@ def profile(id):
         
         flash(error)
 
-    return render_template("auth/profile.html", user=user)
+    return render_template("auth/profile.html", user=user, photo=photo)
+
+
+
