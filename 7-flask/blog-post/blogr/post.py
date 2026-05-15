@@ -46,6 +46,32 @@ def create():
         flash(error)
     return render_template("admin/create.html")
 
-@bp.route("/update")
-def update():
-    return "Página de update"
+@bp.route("/update<int:id>", methods=("GET","POST"))
+@login_required
+def update(id):
+    #creamos objeto Post con su id
+    post=Post.query.get_or_404(id)
+
+    #capturamos los datos del post editados, la url no se modifica
+    if request.method=="POST":
+        post.title=request.form.get("title")
+        post.info=request.form.get("info")
+        post.content=request.form.get("ckeditor")
+
+        #guardamos los datos editados en la bd
+        db.session.commit()
+        flash(f"El blog {post.title} se actualizó correctamente")
+        return redirect(url_for("post.posts"))
+
+    return render_template("admin/update.html",post=post)
+
+
+@bp.route("/delete<int:id>")
+@login_required
+def delete(id):
+    #creamos objeto Post con su id
+    post=Post.query.get_or_404(id)
+    db.session.delete(post)
+    db.session.commit()
+    flash(f"El blog {post.title} se eliminó correctamente")
+    return redirect(url_for("post.posts"))

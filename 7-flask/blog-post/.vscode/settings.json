@@ -10,6 +10,21 @@
             "database": "blogposts_db",
             "username": "postgres",
             "password": ""
+        },
+        {
+            "mysqlOptions": {
+                "authProtocol": "default",
+                "enableSsl": "Disabled"
+            },
+            "ssh": "Disabled",
+            "previewLimit": 50,
+            "server": "localhost",
+            "port": 3306,
+            "driver": "MySQL",
+            "name": "Mi_MySQL",
+            "database": "ecommerce",
+            "username": "root",
+            "password": ""
         }
     ]
 }
