@@ -1,8 +1,4 @@
 #archivo para el modelo de la bd
-
-from email.policy import default
-from math import inf
-
 from blogr import db
 from datetime import datetime
 

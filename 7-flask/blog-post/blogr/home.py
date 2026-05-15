@@ -43,7 +43,7 @@
 # app.register_blueprint(user_bp)
 # Ahora, aunque en el Blueprint definiste la ruta como /profile, al registrarla con el prefijo /user, la URL final será tu_[dominio.com/user/profile](https://dominio.com/user/profile).
 
-from flask import Blueprint, render_template
+from flask import Blueprint,render_template
 
 # 1. Definimos el Blueprint
 bp=Blueprint("home",__name__)
@@ -53,8 +53,10 @@ bp=Blueprint("home",__name__)
 def index():
     return render_template("index.html")
 
-
 @bp.route("/blog")
 def blog():
     return render_template("blog.html")
+
+
+
 

@@ -1,6 +1,8 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 
+from blogr import home
+
 
 #instancia de la db
 db=SQLAlchemy()
@@ -21,6 +23,7 @@ def createApp():
 
     #cargamos los modelos de la bd
     from blogr import home,auth,post
+
     db.init_app(app)
 
     #importamos ckeditor para crear nuestros posts
@@ -29,9 +32,9 @@ def createApp():
 
     #registrar vistas, estás diciéndole a la aplicación principal: "Oye, todas las rutas y funciones que definí en el Blueprint llamado 'home', o 'auth',etc, ahora forman parte de esta app".
     
-    app.register_blueprint(home.bp)
+    app.register_blueprint(home.bp) 
     app.register_blueprint(auth.bp)
-    app.register_blueprint(post.bp) # type: ignore
+    app.register_blueprint(post.bp) 
 
     #aqui migramos los modelos de las tablas a la bd
     from .models import User,Post
@@ -41,3 +44,9 @@ def createApp():
 
         
     return app
+
+
+
+
+
+
