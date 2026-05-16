@@ -1,7 +1,7 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 
-from blogr import home
+
 
 
 #instancia de la db
@@ -21,10 +21,11 @@ def createApp():
     #aqui cargamos el archivo de configuracion
     app.config.from_object("config.Config")
 
+    db.init_app(app)
     #cargamos los modelos de la bd
     from blogr import home,auth,post
 
-    db.init_app(app)
+    # db.init_app(app)
 
     #importamos ckeditor para crear nuestros posts
     from flask_ckeditor import CKEditor

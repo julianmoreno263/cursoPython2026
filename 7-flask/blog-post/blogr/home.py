@@ -43,19 +43,28 @@
 # app.register_blueprint(user_bp)
 # Ahora, aunque en el Blueprint definiste la ruta como /profile, al registrarla con el prefijo /user, la URL final será tu_[dominio.com/user/profile](https://dominio.com/user/profile).
 
-from flask import Blueprint,render_template
+from flask import Blueprint,render_template,request
+from .models import User,Post
 
 # 1. Definimos el Blueprint
 bp=Blueprint("home",__name__)
 
+def get_user(id):
+    user=User.query.get_or_404(id)
+    return user
+
 #2-creamos las vistas que despues se importaran en __init__.py
 @bp.route("/")
 def index():
-    return render_template("index.html")
+    #recuperamos los post y los enviamos a la plantilla para mostrarlos
+    posts=Post.query.all()
+    return render_template("index.html",posts=posts, get_user=get_user)
 
-@bp.route("/blog")
-def blog():
-    return render_template("blog.html")
+@bp.route("/blog/<url>")
+def blog(url):
+    #cuando queramos mostrar un blog especifico lo buscaremos por la url
+    post=Post.query.filter_by(url=url).first()
+    return render_template("blog.html",post=post , get_user=get_user)
 
 
 
