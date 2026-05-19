@@ -53,11 +53,26 @@ def get_user(id):
     user=User.query.get_or_404(id)
     return user
 
+#metodo para implementar en el buscador de la app
+def search_posts(query):
+    #con esta consulta lo que traemos es una lista con la o las palabras que hagan match con nuestra busqueda para esto utilizamos el filtro y con el metodo ilike() le pasamos ese texto que queremos que busque,el buscara en el titulo del post si la palabra que ingresamos esta en el titulo y nos devuelve las coincidencias.
+    posts=Post.query.filter(Post.title.ilike(f"%{query}%")).all() # type: ignore
+    return posts
+
+
 #2-creamos las vistas que despues se importaran en __init__.py
-@bp.route("/")
+@bp.route("/",methods=("GET","POST"))
 def index():
     #recuperamos los post y los enviamos a la plantilla para mostrarlos
     posts=Post.query.all()
+
+    #aqui recuperamos el dato que enviamos desde el buscador de la app en su campo search, y ese dato recuperado es el que le pasamos como parametro a la funcion search_posts que buscara las coincidencias y nos traera los posts,la variable value="hidden" nos sirve para ocultar en la pagina principal la seccion que dice bienvenidos al blog,para que cuando busquemos algo en el buscador solo aparezcan los resultados nada mas.
+    if request.method=="POST":
+        query=request.form.get("search")
+        posts=search_posts(query)
+        value="hidden"
+        return render_template("index.html",posts=posts, get_user=get_user,value=value)
+
     return render_template("index.html",posts=posts, get_user=get_user)
 
 @bp.route("/blog/<url>")

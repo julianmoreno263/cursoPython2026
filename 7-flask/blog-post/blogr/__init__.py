@@ -31,8 +31,13 @@ def createApp():
     from flask_ckeditor import CKEditor
     ckeditor = CKEditor(app)
 
+    #configuracion del idioma de la app en español
+    import locale
+    locale.setlocale(locale.LC_ALL,"es_ES")
+
+
     #registrar vistas, estás diciéndole a la aplicación principal: "Oye, todas las rutas y funciones que definí en el Blueprint llamado 'home', o 'auth',etc, ahora forman parte de esta app".
-    
+
     app.register_blueprint(home.bp) 
     app.register_blueprint(auth.bp)
     app.register_blueprint(post.bp) 
