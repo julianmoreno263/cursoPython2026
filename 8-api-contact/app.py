@@ -53,14 +53,78 @@ def home():
 #ruta para traer los contactos
 @app.route("/contacts", methods=["GET"])
 def get_contacts():
-    return "Lista de contactos"
+    #capturamos los contactos en una lista
+    contacts=Contact.query.all()
+    
+    #recorremos esa lista serializando cada objeto recorrido,los vamos poniendo en un diccionario y los formateamos a json todo en una linea
+    return jsonify({"contacts":[contact.serialize() for contact in contacts]})
 
-#ruta para crear un contacto en la bd
+
+
+#ruta para traer un contacto,lo hacemos por su id
+@app.route("/contact/<int:id>", methods=["GET"])
+def get_contact(id):
+    #capturamos los contactos en una lista
+    contact=Contact.query.get(id)
+    if not contact:
+         return jsonify({"message":"El contacto no existe en la base de datos"}),404
+    
+    #si encuentra el contacto lo devolvemos ya como un json
+    return jsonify(contact.serialize())
+
+
+
+
+#ruta para crear un contacto en la bd, esta ruta se prueba en postman, creamos el objeto json en postman y desde ahi lo enviamos para probar la api,en postman vamos a body,raw,en el cuadro azul que dice text seleccionamos json y en el cuadro grande escribimos nuestro objeto json(en postman los json deben de ir con comillas dobles y el ultimo elemento no tiene coma.)
 @app.route("/create", methods=["POST"])
 def create_contact():
-    return "Se creo un contacto nuevo"
+    #creamos un objeto de tipo json y lo utilizamos para crear el objeto de tipo Contact y pasarle los datos
+    data=request.get_json()
+    contact=Contact(name=data["name"],email=data["email"],phone=data["phone"]) # type: ignore
+    #guardamos en la bd el contacto
+    db.session.add(contact)
+    db.session.commit()
+    #retornamos un mensaje, el contacto y el codigo de estado ok(201)
+    return jsonify({"message":"Contacto creado con exito", "contact":contact.serialize()}),201
 
 
+
+#ruta para editar un registro especifico, podemos utilizar el metodo put o el patch
+@app.route("/edit/<int:id>", methods=["PUT","PATCH"])
+def edit_contact(id):
+    #capturamos el contacto en una lista
+    contact=Contact.query.get(id)
+    #capturamos el objeto json,osea lo que el cliente nos envia
+    data=request.get_json()
+
+    #validamos los datos
+    if "name" in data:
+        contact.name=data["name"]
+    if "email" in data:
+        contact.email=data["email"]
+    if "phone" in data:
+        contact.phone=data["phone"]
+    
+    #guardamos cambios en la bd 
+    db.session.commit()
+
+    return jsonify({"message":"Contacto actualizado con exito", "contact":contact.serialize()}),200
+
+
+
+
+#ruta para eliminar un registro especifico
+@app.route("/delete/<int:id>", methods=["DELETE"])
+def delete_contact(id):
+    #capturamos los contactos en una lista
+    contact=Contact.query.get(id)
+    if not contact:
+         return jsonify({"message":"El contacto no existe en la base de datos"}),404
+    
+    db.session.delete(contact)
+    db.session.commit()
+
+    return jsonify({"message":"Contacto eliminado con exito"})
 
 
 
