@@ -1,0 +1,11 @@
+{
+    "sqltools.useNodeRuntime": true,
+    "sqltools.connections": [
+        {
+            "previewLimit": 50,
+            "driver": "SQLite",
+            "name": "sqlite-python",
+            "database": "${workspaceFolder:8-api-contact}/instance/contacts.db"
+        }
+    ]
+}
