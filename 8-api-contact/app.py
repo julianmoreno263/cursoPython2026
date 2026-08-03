@@ -99,16 +99,16 @@ def edit_contact(id):
 
     #validamos los datos
     if "name" in data:
-        contact.name=data["name"]
+        contact.name=data["name"] # type: ignore
     if "email" in data:
-        contact.email=data["email"]
+        contact.email=data["email"] # type: ignore
     if "phone" in data:
-        contact.phone=data["phone"]
+        contact.phone=data["phone"] # type: ignore
     
     #guardamos cambios en la bd 
     db.session.commit()
 
-    return jsonify({"message":"Contacto actualizado con exito", "contact":contact.serialize()}),200
+    return jsonify({"message":"Contacto actualizado con exito", "contact":contact.serialize()}),200 # type: ignore
 
 
 

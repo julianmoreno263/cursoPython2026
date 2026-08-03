@@ -1,0 +1,14 @@
+password de root: tor
+puerto: 5432
+
+
+
+Cómo conectar VS Code a tu Postgres localIndependientemente de la extensión que elijas, los datos que te pedirá para conectar con el Postgres
+ 
+que acabas de instalar en Windows suelen ser estos:
+
+1- Hostname	localhost
+2- Port	5432
+3- User	postgres
+4- Password   tor
+5- Database	postgres (o el nombre de la que hayas creado)
